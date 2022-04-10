@@ -121,7 +121,7 @@ def handle_TextMessage(event):
         adoutMeKeywords = ['關於我','foodsnorlax','about me','robot','about','line bot','bot','關於','簡介']
         if user_msg in ratingKeywords:
             if user_id in users_choose_restaurant.keys():
-                rest_data = users_choose_restaurant[user_id]
+                # rest_data = users_choose_restaurant[user_id]
                 line_bot_api.reply_message(event.reply_token,TextSendMessage(
                     text='如果覺得值得下次光顧\n請給予$\n所以覺得尚可\n請給予$\n如果覺得不適合您的口味\n請給予$\n\n請給分（點擊數字1-5）：',
                     emojis = [{"index":14,"productId":"5ac21a18040ab15980c9b43e","emojiId":"142"},{"index":26,"productId":"5ac21a18040ab15980c9b43e","emojiId":"140"},{"index":43,"productId":"5ac21a18040ab15980c9b43e","emojiId":"138"}],
