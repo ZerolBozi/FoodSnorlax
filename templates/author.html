@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Author</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Snolax.ico') }}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <img src="{{ url_for('static', filename='img/Snolax.jpg')}}" alt="Snolax" id="bg-img">
+    <div class="card">
+        <div class="content-title">
+            <h1>About author</h1>
+        </div>
+        <div class="content">
+            <p>
+                這個作者很懶，沒有留下任何資訊。
+            </p>
+            <p style="font-size: 14px;">
+                *如果你有任何建議，請聯絡我：
+                <a href="mailto:41041223@gm.nfu.edu.tw" target="blank" style="color: black; margin-right: 10px;">Mail</a>
+                <a href="https://github.com/ZerolBozi" target="blank" style="color: black;">Github</a>
+            </p>
+            <p>
+                <a href="/" style="color: black;font-weight: bold; font-style: italic;">About FoodSnolax</a>
+            </p>
+        </div>
+    </div>
+    <script>
+        window.addEventListener('load', function () {
+            resize_tab();
+        });
+    
+        $(window).resize(function () {
+            resize_tab();
+        }).resize();
+    
+        function resize_tab() {
+    
+            var viewportWidth = $(window).innerWidth();
+            var viewportHeight = $(window).innerHeight();
+    
+            var width = $('#bg-img').width();
+            var height = $('#bg-img').height();
+    
+    
+            if ((viewportWidth / viewportHeight) > (width / height)) {
+    
+                $('#bg-img').css({
+                    'width': '100%',
+                    'height': 'auto',
+                    'margin-left': 0 - width / 2,
+                    'margin-top': 0 - height / 2
+                });
+    
+    
+            } else {
+                $('#bg-img').css({
+                    'width': 'auto',
+                    'height': '100%',
+                    'margin-left': 0 - width / 2,
+                    'margin-top': 0 - height / 2
+                });
+            }
+        }
+    </script>
+</body>
+</html>
