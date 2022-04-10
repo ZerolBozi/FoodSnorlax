@@ -288,7 +288,6 @@ def handle_TextMessage(event):
 def handle_StickerMessage(event):
     defaultPackageIdList = ['1','2','3','4','446','789','1070','6136','6325','6359','6362','6370','6632','8515','8522','8525','11537','11538','11539']
     if event.message.package_id in defaultPackageIdList:
-        print(event.message.package_id,event.message.sticker_id)
         line_bot_api.reply_message(event.reply_token,StickerSendMessage(event.message.package_id,event.message.sticker_id))
     else:
         msg = [TextSendMessage(text="I don't have that sticker."),TextSendMessage(text="Can you buy it for me? $",emojis=[{"index":23,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"003"}])]
