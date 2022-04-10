@@ -84,9 +84,10 @@ def handle_Postback(event):
         else:
             comments = random.choice(comments_4_5)
         msg = []
-        msg.append(TextSendMessage(text=f"—————店家資訊—————\n店名：{rest_name}\n地址：{address}\n評價：{rating.rating}\n評價數：{rating.users_rating_total}\n\nSnolax評語：{comments}"))
+        msg.append(TextSendMessage(text=f"—————店家資訊—————\n店名：{rest_name}\n地址：{address}\n評價：{rating.rating}\n評價數：{rating.users_rating_total}\n\nSnorlax評語：{comments}"))
         msg.append(StickerSendMessage(package_id='1', sticker_id=str(random.choice(sticker_id_list))))
         line_bot_api.reply_message(event.reply_token,msg)
+        users_choose_restaurant[user_id] = {}
 
 # line bot message event function
 @handler.add(MessageEvent,message=TextMessage)
@@ -121,29 +122,31 @@ def handle_TextMessage(event):
         adoutMeKeywords = ['關於我','foodsnorlax','about me','robot','about','line bot','bot','關於','簡介']
         if user_msg in ratingKeywords:
             if user_id in users_choose_restaurant.keys():
-                # rest_data = users_choose_restaurant[user_id]
-                line_bot_api.reply_message(event.reply_token,TextSendMessage(
-                    text='如果覺得值得下次光顧\n請給予$\n所以覺得尚可\n請給予$\n如果覺得不適合您的口味\n請給予$\n\n請給分（點擊數字1-5）：',
-                    emojis = [{"index":14,"productId":"5ac21a18040ab15980c9b43e","emojiId":"142"},{"index":26,"productId":"5ac21a18040ab15980c9b43e","emojiId":"140"},{"index":43,"productId":"5ac21a18040ab15980c9b43e","emojiId":"138"}],
-                    quick_reply=QuickReply(
-                        items=[
-                            QuickReplyButton(
-                                action=PostbackAction(label="1", data="rating1")
-                            ),
-                            QuickReplyButton(
-                                action=PostbackAction(label="2", data="rating2")
-                            ),
-                            QuickReplyButton(
-                                action=PostbackAction(label="3", data="rating3")
-                            ),
-                            QuickReplyButton(
-                                action=PostbackAction(label="4", data="rating4")
-                            ),
-                            QuickReplyButton(
-                                action=PostbackAction(label="5", data="rating5")
-                            ),
-                        ]
-                )))
+                if users_choose_restaurant[user_id] != {}:
+                    line_bot_api.reply_message(event.reply_token,TextSendMessage(
+                        text='如果覺得值得下次光顧\n請給予$\n所以覺得尚可\n請給予$\n如果覺得不適合您的口味\n請給予$\n\n請給分（點擊數字1-5）：',
+                        emojis = [{"index":14,"productId":"5ac21a18040ab15980c9b43e","emojiId":"142"},{"index":26,"productId":"5ac21a18040ab15980c9b43e","emojiId":"140"},{"index":43,"productId":"5ac21a18040ab15980c9b43e","emojiId":"138"}],
+                        quick_reply=QuickReply(
+                            items=[
+                                QuickReplyButton(
+                                    action=PostbackAction(label="1", data="rating1")
+                                ),
+                                QuickReplyButton(
+                                    action=PostbackAction(label="2", data="rating2")
+                                ),
+                                QuickReplyButton(
+                                    action=PostbackAction(label="3", data="rating3")
+                                ),
+                                QuickReplyButton(
+                                    action=PostbackAction(label="4", data="rating4")
+                                ),
+                                QuickReplyButton(
+                                    action=PostbackAction(label="5", data="rating5")
+                                ),
+                            ]
+                    )))
+                else:
+                    line_bot_api.reply_message(event.reply_token,TextSendMessage(text='請先使用「尋找」功能找尋附近的餐廳！！'))
             else:
                 line_bot_api.reply_message(event.reply_token,TextSendMessage(text='請先使用「尋找」功能找尋附近的餐廳！！'))
         
@@ -179,7 +182,7 @@ def handle_TextMessage(event):
             msg = [TextSendMessage(text='我是FoodSnorlax，歡迎使用尋找美食小助手～\n有任何的問題都可以輸入"幫助"\n我可以給你解答呦$',emojis=[{"index":54,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"002"}]),
             StickerSendMessage(11538,51626494)]
             line_bot_api.reply_message(event.reply_token,msg)
-            
+
         # other message give order function
         else:
             now_time = int(time.strftime("%H",time.localtime()))
@@ -334,7 +337,7 @@ def handle_LocationMessage(event):
     global users_choose_restaurant
     msg = []
 
-    msg.append(TextSendMessage(text='FoodSnolax小助手：\n尋找的結果如下$',emojis=[{"index":22,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"021"}]))
+    msg.append(TextSendMessage(text='FoodSnorlax小助手：\n尋找的結果如下$',emojis=[{"index":22,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"021"}]))
 
     title = f"{res[0]['name']} \n評分：{res[0]['rating']}\n總評論數：{res[0]['user_ratings_total']}"
     msg.append(LocationSendMessage(title,res[0]['vicinity'],res[0]['geometry']['location']['lat'],res[0]['geometry']['location']['lng']))
