@@ -1,0 +1,42 @@
+#bg-img {
+    opacity: 0.7;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: -99;
+}
+
+.card{
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    margin: 4% auto 0px auto;
+    max-width: 840px;
+    max-height: 65%;
+    padding: 50px 50px 20px 100px;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    -webkit-transition: 0.6s;
+    -moz-transition: 0.6s;
+    -ms-transition: 0.6s;
+    -o-transition: 0.6s;
+    transition: 0.6s;
+    opacity: 0.7;
+}
+.card:hover{
+    -webkit-animation: card-1 0.6s;
+    -moz-animation: card-1 0.6s;
+    -ms-animation: card-1 0.6s;
+    -o-animation: card-1 0.6s;
+    animation: card-1 0.6s;
+    opacity: 0.99;
+}
+
+.content-title{
+    padding-bottom: 10px;
+}
+
+.content{
+    font-size: 16px;
+}
