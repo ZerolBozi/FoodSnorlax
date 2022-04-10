@@ -1,6 +1,7 @@
 import googlemaps
 
-gmaps = googlemaps.Client(key='googlemaps api key')
+# connect google maps with API key
+gmaps = googlemaps.Client(key='googlemaps API key')
 
 cities = ["臺北市","新北市","桃園市","臺中市","臺南市","高雄市","基隆市","新竹市","嘉義市","新竹縣","苗栗縣","彰化縣","南投縣","雲林縣","嘉義縣","屏東縣","宜蘭縣","花蓮縣","臺東縣","澎湖縣"]
 
@@ -10,7 +11,7 @@ def address_Proc(address):
     else:
         return ''
 
-def search_Food(latlng,keyword,open_now,search,rating_sort=True,rating_total_sort=True,radius=2000,ratings_total=0):
+def search_Food(latlng,keyword,open_now,search,rating_sort=True,rating_total_sort=True,radius=2000,ratings_total=0,debug=False):
     """
     :param latlng: The latitude/longitude value for which you wish to obtain the closest, human-readable address.(loaction)
     :type latlng: string, dict, list, or tuple
@@ -36,6 +37,9 @@ def search_Food(latlng,keyword,open_now,search,rating_sort=True,rating_total_sor
     :param ratings_total: User ratings total need > that value.(default == 0)
     :type ratings_total: int
 
+    :param debug: Output debug information.(default == False)
+    :type debug: bool
+
     :rtype: Search results list (default sorted by rating).
     """
     loc = gmaps.reverse_geocode(latlng=latlng)[0]['geometry']['location']
@@ -55,8 +59,10 @@ def search_Food(latlng,keyword,open_now,search,rating_sort=True,rating_total_sor
     if rating_sort:
         sortedResults = sorted(sortedResults,key=lambda d: d['rating'],reverse=True)
     
-    for res in sortedResults:
-        print(f"店名：{res['name']} 評價：{res['rating']} 評價數：{res['user_ratings_total']}")
+    # output debug
+    if debug:
+        for res in sortedResults:
+            print(f"[&search_Food Debug] 店名：{res['name']} 評價：{res['rating']} 評價數：{res['user_ratings_total']}")
 
     return sortedResults
         
