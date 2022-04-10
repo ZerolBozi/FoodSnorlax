@@ -123,7 +123,7 @@ def handle_TextMessage(event):
             if user_id in users_choose_restaurant.keys():
                 rest_data = users_choose_restaurant[user_id]
                 line_bot_api.reply_message(event.reply_token,TextSendMessage(
-                    text='如果覺得值得下次光顧\n請給予$\n所以覺得尚可\n請給予$\n如果覺得不適合您的口味\n請給予$\n\n請給分（輸入數字1-5）：',
+                    text='如果覺得值得下次光顧\n請給予$\n所以覺得尚可\n請給予$\n如果覺得不適合您的口味\n請給予$\n\n請給分（點擊數字1-5）：',
                     emojis = [{"index":14,"productId":"5ac21a18040ab15980c9b43e","emojiId":"142"},{"index":26,"productId":"5ac21a18040ab15980c9b43e","emojiId":"140"},{"index":43,"productId":"5ac21a18040ab15980c9b43e","emojiId":"138"}],
                     quick_reply=QuickReply(
                         items=[
@@ -175,6 +175,11 @@ def handle_TextMessage(event):
             StickerSendMessage(11538,51626501)]
             line_bot_api.reply_message(event.reply_token,msg)
         
+        elif user_msg in adoutMeKeywords:
+            msg = [TextSendMessage(text='我是FoodSnorlax，歡迎使用尋找美食小助手～\n有任何的問題都可以輸入"幫助"\n我可以給你解答呦$',emojis=[{"index":54,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"002"}]),
+            StickerSendMessage(11538,51626494)]
+            line_bot_api.reply_message(event.reply_token,msg)
+            
         # other message give order function
         else:
             now_time = int(time.strftime("%H",time.localtime()))
@@ -310,11 +315,10 @@ def handle_LocationMessage(event):
 
     rating_sort = False
     rating_total_sort = False
-    rndChoose = False
+    rndChoose = True
 
     if '隨機' in keyword:
         keyword = 'food' if keyword.replace('隨機','') == '' else keyword.replace('隨機','')
-        rndChoose = True
     
     if keyword in nightMeal.keys():
         rndChoose = True if nightMeal[keyword] == 0 else False
