@@ -44,15 +44,20 @@ def checkUserExist(uid,name):
     """
     user = users.query.filter_by(uid = uid).first()
     if user is None:
-        addUser(uid, name, "")
-        return getAllUsers()
+        if addUser(uid, name, "","","",""):
+            return getAllUsers()
+        return None
     else:
         return []
 
-def addUser(uid, name, lastOrder):
-    user = users(uid, name, lastOrder)
-    db.session.add(user)
-    db.session.commit()
+def addUser(uid, name, lastRecord, fav_type, fav_rest, dislike_rest):
+    # 限制測試人員8人內
+    if len(getAllUsers()) <= 8:
+        user = users(uid, name, lastRecord, fav_type, fav_rest, dislike_rest)
+        db.session.add(user)
+        db.session.commit()
+        return True
+    return False
 
 def getAllUsers():
     return users.query.all()
@@ -120,8 +125,10 @@ def getRatingByName(rest_name):
 
 if __name__ == '__main__':
     pass
-    ''''
+    '''
     data = getAllUsers()
+    print(data)
+    print(len(data))
     for i in data:
         print(i.uid)
     '''
