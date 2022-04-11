@@ -49,19 +49,15 @@ def search_Food(latlng,keyword,open_now,search,rating_sort=True,rating_total_sor
     else:
         results = gmaps.places_nearby(keyword=keyword,location=loc,open_now=open_now,radius=radius,type='restaurant')['results']
 
+    if rating_sort:
+        results = sorted(results, key=lambda x: x['rating'], reverse=True)
+
     sortedResults = sorted(results,key=lambda d: d['user_ratings_total'],reverse=True) if rating_total_sort else sorted(results,key=lambda d: d['user_ratings_total'])
 
-    # 需要先用評價分數排序再用評價總數排序
-    # 我寫錯了 需要修改
-    # 這段話是提醒我修改的==
-    
     for res in sortedResults:
         if res['user_ratings_total'] >= ratings_total:
             sortedResults = sortedResults[sortedResults.index(res):len(sortedResults)]
             break
-    
-    if rating_sort:
-        sortedResults = sorted(sortedResults,key=lambda d: d['rating'],reverse=True)
     
     # output debug
     if debug:
