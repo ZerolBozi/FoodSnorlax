@@ -99,6 +99,7 @@ def handle_TextMessage(event):
     global users_choose_restaurant
     global userChoose
     flag = False
+    
     try:
         if users_data != []:
             for users in users_data:
@@ -111,14 +112,24 @@ def handle_TextMessage(event):
 
     if not flag:
         tmpData = checkUserExist(user_id,user_info.display_name)
-        users_data = users_data if tmpData == [] else tmpData
-        msg = [TextSendMessage(text='哈囉！我是FoodSnorlax，歡迎使用尋找美食小助手～\n有任何的問題都可以輸入"幫助"\n我可以給你解答呦$',emojis=[{"index":54,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"002"}]),
-            StickerSendMessage(11538,51626494)]
+        if tmpData is None:
+            msg = [TextSendMessage(
+                text='哈囉！我是FoodSnorlax，歡迎使用尋找美食小助手～\n目前測試人員已經額滿囉！\n暫時沒辦法為你服務哦～Sorry$',
+                emojis=[{"index":59,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"032"}]
+                ),
+                StickerSendMessage(1,107)]
+        else:
+            users_data = users_data if tmpData == [] else tmpData
+            msg = [TextSendMessage(
+                text='哈囉！我是FoodSnorlax\n歡迎使用尋找美食小助手～\n有任何的問題都可以輸入"幫助"\n我可以給你解答呦$',
+                emojis=[{"index":54,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"002"}]
+                ),
+                StickerSendMessage(11538,51626494)]
         line_bot_api.reply_message(event.reply_token,msg)
     else:
         ratingKeywords = ['評價','評分']
         ratingKeywords2 = ['1','2','3','4','5']
-        helpKeywords = ['幫助','help','幫手','求救','點餐','找餐廳','找食物','小助手','助手','小幫手']
+        helpKeywords = ['幫助','help','幫手','求救','小助手','助手','小幫手']
         adoutMeKeywords = ['關於我','foodsnorlax','about me','robot','about','line bot','bot','關於','簡介']
         if user_msg in ratingKeywords:
             if user_id in users_choose_restaurant.keys():
@@ -174,13 +185,16 @@ def handle_TextMessage(event):
                 )))
 
         elif user_msg.lower() in helpKeywords:
-            msg = [TextSendMessage(text='輸入關鍵字以外的文字\n就可以進行尋找食物哦$',emojis=[{"index":21,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"032"}]),
+            msg = [TextSendMessage(text='輸入找食物或任意的文字\n就可以使用尋找食物的功能哦$',emojis=[{"index":25,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"032"}]),
             StickerSendMessage(11538,51626501)]
             line_bot_api.reply_message(event.reply_token,msg)
         
-        elif user_msg in adoutMeKeywords:
-            msg = [TextSendMessage(text='我是FoodSnorlax，歡迎使用尋找美食小助手～\n有任何的問題都可以輸入"幫助"\n我可以給你解答呦$',emojis=[{"index":54,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"002"}]),
-            StickerSendMessage(11538,51626494)]
+        elif user_msg.lower() in adoutMeKeywords:
+            msg = [TextSendMessage(
+                text='我是FoodSnorlax\n歡迎使用尋找美食小助手～\n有任何的問題都可以輸入"幫助"\n我可以給你解答呦$\n更詳細的內容可以到官網查看：https://reurl.cc/RjaerD',
+                emojis=[{"index":51,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"002"}]
+                ),
+                StickerSendMessage(11538,51626494)]
             line_bot_api.reply_message(event.reply_token,msg)
 
         # other message give order function
@@ -329,15 +343,15 @@ def handle_LocationMessage(event):
         rating_total_sort = nightMeal[keyword] == 2 or nightMeal[keyword] == 3
         keyword = 'food' 
     
-    res = search_Food(latlng=[latitude,longitude],keyword=keyword,open_now=True,search=True,rating_sort=rating_sort,rating_total_sort=rating_total_sort)
+    res = search_Food(latlng=[latitude,longitude],keyword=keyword,open_now=True,search=True,rating_sort=rating_sort,rating_total_sort=rating_total_sort,debug=True)
 
     if rndChoose:
         res = random.sample(res,1)
 
     global users_choose_restaurant
+    
     msg = []
-
-    msg.append(TextSendMessage(text='FoodSnorlax小助手：\n尋找的結果如下$',emojis=[{"index":22,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"021"}]))
+    msg.append(TextSendMessage(text='FoodSnorlax小助手：\n尋找的結果如下$',emojis=[{"index":23,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"021"}]))
 
     title = f"{res[0]['name']} \n評分：{res[0]['rating']}\n總評論數：{res[0]['user_ratings_total']}"
     msg.append(LocationSendMessage(title,res[0]['vicinity'],res[0]['geometry']['location']['lat'],res[0]['geometry']['location']['lng']))
@@ -354,4 +368,3 @@ def handle_LocationMessage(event):
     line_bot_api.reply_message(event.reply_token,msg)
     users_choose_restaurant[user_id] = res[0]
     updateLastRecord(user_id,res[0])
-    
