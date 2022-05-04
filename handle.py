@@ -55,13 +55,13 @@ def callback():
 def handle_Postback(event):
     user_id = event.source.user_id
     postbackData = event.postback.data
-    global userChoose
+    global user_choose
     global price_range
     print(f'[Debug {time.strftime("%H:%M:%S", time.localtime())}] userId: {user_id}, event: PostbackEvent, postbackData: {postbackData}')
 
     if 'userChoose' in postbackData:
         postbackData = postbackData.replace('userChoose','')
-        userChoose[user_id] = postbackData
+        user_choose[user_id] = postbackData
         price_range[user_id] = [0,4]
         postbackData = "隨機" if "隨機" in postbackData else postbackData
         line_bot_api.reply_message(event.reply_token,TextSendMessage(
@@ -81,7 +81,6 @@ def handle_Postback(event):
             )))
     elif 'Price' in postbackData:
         postbackData = postbackData.replace('Price','')
-        price_dict = {'1':[0,1],'2':[0,2], '3':[2,4]}
         if postbackData == 'set':
             line_bot_api.reply_message(event.reply_token,TextSendMessage(
                 text='請選擇您想要的價位：',
@@ -99,6 +98,7 @@ def handle_Postback(event):
                     ]
                 )))
         else:
+            price_dict = {'1':[0,1],'2':[0,2], '3':[2,4]}
             price_range[user_id] = price_dict[postbackData]
             tmp_price_dict = {'1':'便宜','2':'普通','3':'昂貴'}
             line_bot_api.reply_message(event.reply_token,TextSendMessage(
@@ -125,7 +125,7 @@ def handle_Postback(event):
         global users_choose_restaurant
         postbackData = postbackData.replace('rating','')
         rest_name = users_choose_restaurant[user_id]['name']
-        keyword = userChoose[user_id]
+        keyword = user_choose[user_id]
         location = [users_choose_restaurant[user_id]['geometry']['location']['lat'],users_choose_restaurant[user_id]['geometry']['location']['lng']]
         address = users_choose_restaurant[user_id]['vicinity']
         addRating(user_id, rest_name, keyword, location, int(postbackData))
@@ -151,7 +151,7 @@ def handle_TextMessage(event):
     user_info = line_bot_api.get_profile(user_id)
     global users_data
     global users_choose_restaurant
-    global userChoose
+    global user_choose
     global users_habby
     global users_location
     global price_range
@@ -165,7 +165,7 @@ def handle_TextMessage(event):
     else:
         users_data = getAllUsers()
         users_choose_restaurant = getAllLastRecord(0,users_data)
-        userChoose = getAllLastRecord(1,users_data)
+        user_choose = getAllLastRecord(1,users_data)
         users_habby = getAllHobby(users_data)
         users_location = dict()
         price_range = dict()
@@ -456,11 +456,11 @@ def handle_LocationMessage(event):
     rndKeyword_night = rndKeyword_base + ['宵夜','燒烤','烤肉','居酒屋','早餐']
     rndKeyword_dict = {'早':rndKeyword_morning,'午':rndKeyword_noon,'下午':rndKeyword_afternoon,'晚':rndKeyword_evening}
     user_id = event.source.user_id
-    global userChoose
+    global user_choose
     global users_habby
     global users_location
     global price_range
-    keyword = userChoose[user_id]
+    keyword = user_choose[user_id]
     price = price_range[user_id]
     # address = event.message.address
     latitude = event.message.latitude
