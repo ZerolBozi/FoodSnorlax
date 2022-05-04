@@ -471,7 +471,7 @@ def handle_LocationMessage(event):
     rndChoose = True
     search_type = 'restaurant'
     search = random.choice([True,False])
-    radius = random.randint(2000,5000)
+    radius = random.randint(1000,3000)
 
     if '隨機' in keyword:
         keyword = keyword.replace('隨機','')
