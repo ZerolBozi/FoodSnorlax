@@ -10,7 +10,7 @@ from linebot.models import (
     QuickReply, QuickReplyButton, 
     MessageAction, LocationAction, PostbackAction
 )
-from search import search_Food
+from search import search_Food, address_Proc
 from rating import (
     checkUserExist, getAllUsers, 
     updateLastRecord, addRating, 
@@ -155,6 +155,7 @@ def handle_TextMessage(event):
     global users_habby
     global users_location
     global price_range
+    global delivery_link_data
     flag = False
     print(f'[Debug {time.strftime("%H:%M:%S", time.localtime())}] userId: {user_id}, event: MessageEvent, message: {user_msg}')
 
@@ -169,6 +170,7 @@ def handle_TextMessage(event):
         users_habby = getAllHobby(users_data)
         users_location = dict()
         price_range = dict()
+        delivery_link_data = dict()
 
     if not flag:
         tmpData = checkUserExist(user_id,user_info.display_name)
@@ -246,10 +248,16 @@ def handle_TextMessage(event):
                     ])
                 )) 
         elif user_msg in deliveryKeywords:
+            delivery_bool = False
+            found = False
             link = getDeliveryLink(users_choose_restaurant[user_id]['name'])
             if link is None:
-                found = False
-                datas = foodpanda_location_rest(users_location[user_id],debug=True)
+                if address_Proc(users_location[user_id][2]) not in delivery_link_data.keys():
+                    datas = foodpanda_location_rest(users_location[user_id][0:2],debug=True)
+                    delivery_link_data[address_Proc(users_location[user_id][2])] = datas
+                    delivery_bool = True
+                else:
+                    datas = delivery_link_data[address_Proc(users_location[user_id][2])]
                 for rest_name in datas.keys():
                     if rest_name in users_choose_restaurant[user_id]['name'] or users_choose_restaurant[user_id]['name'] in rest_name:
                         line_bot_api.reply_message(event.reply_token,TextSendMessage(
@@ -277,6 +285,9 @@ def handle_TextMessage(event):
                                 )
                             ])
                         ))
+                    if not delivery_bool:
+                        datas = foodpanda_location_rest(users_location[user_id][0:2],debug=True)
+                        delivery_link_data[address_Proc(users_location[user_id][2])] = datas          
             else:
                 line_bot_api.reply_message(event.reply_token,TextSendMessage(
                     text = link,
@@ -453,56 +464,65 @@ def handle_LocationMessage(event):
     rndKeyword_noon = rndKeyword_base + ['早午餐','拉麵','水餃','便當','火鍋','麵','咖哩','飯','午餐']
     rndKeyword_afternoon = rndKeyword_base + ['下午茶','甜點','咖啡','點心']
     rndKeyword_evening = rndKeyword_base + ['晚餐','火鍋','水餃','便當','飯','麵','咖哩','烤肉']
-    rndKeyword_night = rndKeyword_base + ['宵夜','燒烤','烤肉','居酒屋','早餐']
+    rndKeyword_night = rndKeyword_base + ['宵夜','燒烤','烤肉','早餐']
     rndKeyword_dict = {'早':rndKeyword_morning,'午':rndKeyword_noon,'下午':rndKeyword_afternoon,'晚':rndKeyword_evening}
     user_id = event.source.user_id
     global user_choose
     global users_habby
     global users_location
     global price_range
+    global users_choose_restaurant
     keyword = user_choose[user_id]
     price = price_range[user_id]
-    # address = event.message.address
+    address = event.message.address
     latitude = event.message.latitude
     longitude = event.message.longitude
-    users_location[user_id] = [latitude,longitude]
+    users_location[user_id] = [latitude,longitude,address]
     rating_sort = False
     rating_total_sort = False
-    rndChoose = True
+    rnd_choose = True
+    #rnd_habby = random.choice([True,False])
     search_type = 'restaurant'
     search = random.choice([True,False])
-    radius = random.randint(1000,3000)
+    radius = random.randint(200,800)
+    tmp_habby_data = users_habby[user_id]
 
     if '隨機' in keyword:
         keyword = keyword.replace('隨機','')
         keyword = random.choice(rndKeyword_dict[keyword])
     
     if keyword in nightMeal.keys():
-        rndChoose = True if nightMeal[keyword] == 0 else False
+        rnd_choose = True if nightMeal[keyword] == 0 else False
         rating_sort = nightMeal[keyword] == 1 or nightMeal[keyword] == 3
         rating_total_sort = nightMeal[keyword] == 2 or nightMeal[keyword] == 3
         keyword = random.choice(rndKeyword_night)
 
     if '咖啡' in keyword:
         search_type = 'cafe'
-    
+
+    #if rnd_habby:
+        #keyword = random.choice(tmp_habby_data['fav_type'])
+
     print(f'[Debug {time.strftime("%H:%M:%S", time.localtime())}] userId: {user_id}, event: LocationEvent, location: {event.message.address}, keyword: {keyword}')
     
     if search:
         res = search_Food(latlng=[latitude,longitude],keyword=keyword,open_now=True,search=True,rating_sort=rating_sort,rating_total_sort=rating_total_sort,debug=True,type=search_type,price_range=price)
     else:
         res = search_Food(latlng=[latitude,longitude],keyword=keyword,open_now=True,search=False,radius=radius,rating_sort=rating_sort,rating_total_sort=rating_total_sort,debug=True,type=search_type,price_range=price)
-    
-    tmpData = users_habby[user_id]
 
     for rest in res:
-        if rest['name'] == tmpData['dislike_rest']:
+        if rest['name'] in tmp_habby_data['dislike_rest']:
             res.remove(rest)
-    
-    if rndChoose and len(res) > 1:
-        res = random.sample(res,1)
+        
+        if user_id in users_choose_restaurant.keys():
+            if rest['name'] == users_choose_restaurant[user_id]['name']:
+                res.remove(rest)
 
-    global users_choose_restaurant
+    # 如果返回結果為空或是被移除後為空的時候會出bug，我想不到怎麼解決==
+    # 所以我覺得先放著，等他出問題再說
+    
+    if rnd_choose and len(res) > 1:
+        res = random.sample(res,1)
     
     msg = []
     msg.append(TextSendMessage(text='FoodSnorlax小助手：\n尋找的結果如下$',emojis=[{"index":23,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"021"}]))
