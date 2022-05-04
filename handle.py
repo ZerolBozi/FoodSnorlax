@@ -517,33 +517,44 @@ def handle_LocationMessage(event):
         if user_id in users_choose_restaurant.keys():
             if rest['name'] == users_choose_restaurant[user_id]['name']:
                 res.remove(rest)
-
-    # 如果返回結果為空或是被移除後為空的時候會出bug，我想不到怎麼解決==
-    # 所以我覺得先放著，等他出問題再說
     
     if rnd_choose and len(res) > 1:
         res = random.sample(res,1)
-    
-    msg = []
-    msg.append(TextSendMessage(text='FoodSnorlax小助手：\n尋找的結果如下$',emojis=[{"index":23,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"021"}]))
 
-    title = f"{res[0]['name']} \n評分：{res[0]['rating']}\n總評論數：{res[0]['user_ratings_total']}"
-    msg.append(LocationSendMessage(title,res[0]['vicinity'],res[0]['geometry']['location']['lat'],res[0]['geometry']['location']['lng']))
-    msg.append(TextSendMessage(text='如果您想要外送的話～\n請點選下方選單中的"外送連結"'))
-    msg.append(TextSendMessage(
-        text='用餐後完畢後\n可以點擊"餐廳評分"\n對餐廳進行評分呦～\n您的評分可以提供我們做數據分析\n挑選符合您喜好的餐廳類型$',
-        emojis=[{"index":56,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"009"}],
-        quick_reply=QuickReply(
-            items=[
-                QuickReplyButton(
-                    action = MessageAction(label="餐廳評價",text="餐廳評價")
-                ),
-                QuickReplyButton(
-                    action = MessageAction(label="不是你想要的嗎？再重新幫你搜尋一次", text="換一個")
+    if len(res) == 0:
+        TextSendMessage(
+            text="Sorry,小助手找不到餐廳$",
+            emojis=[{"index":14,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"024"}],
+            quick_reply=QuickReply(
+                items=[
+                    QuickReplyButton(
+                        action=MessageAction(label="重新尋找",text="找食物")
+                        ),
+                    ]
                 )
-            ],
             )
-        ))
-    line_bot_api.reply_message(event.reply_token,msg)
-    users_choose_restaurant[user_id] = res[0]
-    updateLastRecord(user_id,res[0])
+        line_bot_api.reply_message(event.reply_token,msg)
+    else:
+        msg = []
+        msg.append(TextSendMessage(text='FoodSnorlax小助手：\n尋找的結果如下$',emojis=[{"index":23,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"021"}]))
+
+        title = f"{res[0]['name']} \n評分：{res[0]['rating']}\n總評論數：{res[0]['user_ratings_total']}"
+        msg.append(LocationSendMessage(title,res[0]['vicinity'],res[0]['geometry']['location']['lat'],res[0]['geometry']['location']['lng']))
+        msg.append(TextSendMessage(text='如果您想要外送的話～\n請點選下方選單中的"外送連結"'))
+        msg.append(TextSendMessage(
+            text='用餐後完畢後\n可以點擊"餐廳評分"\n對餐廳進行評分呦～\n您的評分可以提供我們做數據分析\n挑選符合您喜好的餐廳類型$',
+            emojis=[{"index":56,"productId":"5ac1bfd5040ab15980c9b435","emojiId":"009"}],
+            quick_reply=QuickReply(
+                items=[
+                    QuickReplyButton(
+                        action = MessageAction(label="餐廳評價",text="餐廳評價")
+                    ),
+                    QuickReplyButton(
+                        action = MessageAction(label="不是你想要的嗎？再重新幫你搜尋一次", text="換一個")
+                    )
+                ],
+                )
+            ))
+        line_bot_api.reply_message(event.reply_token,msg)
+        users_choose_restaurant[user_id] = res[0]
+        updateLastRecord(user_id,res[0])
