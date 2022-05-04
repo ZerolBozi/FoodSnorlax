@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 # set server and database coning
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://name:pw@address/database'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # set line bot config
